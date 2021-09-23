@@ -154,12 +154,12 @@ app.post("/makeadmin", isAuthorized, isAdmin, async (req,res)=>{
     
     
  })
- app.put('/post/:userId', isAuthorized,async (req, res, next) => {
-  const userId = req.params.userId;
+ app.put('/post/:postId', isAuthorized,async (req, res, next) => {
+  const postId = req.params.postId;
   const title = req.body.title;
   const description = req.body. description;
 
-     const post = await db.post.findOne({ where: {user_id: userId} });
+     const post = await db.post.findOne({ where: {id: postId} });
      console.log({
          post
      });
@@ -194,7 +194,7 @@ app.post("/makeadmin", isAuthorized, isAdmin, async (req,res)=>{
         //list of posts
 
         const postId = req.params.postId;
-       const posts = await db.post.findAll ({where:{
+       const posts = await db.post.findOne ({where:{
             Id:postId
         }})
 
@@ -209,6 +209,33 @@ app.post("/makeadmin", isAuthorized, isAdmin, async (req,res)=>{
         })
     }
 });
+
+app.get("/myposts",isAuthorized, async(req, res)=>{
+    
+        
+        const userId = req.user.id
+    
+   
+   
+    try{
+        // # of posts
+        const userId = req.user.id;
+       const posts = await db.post.findOne ({where:{
+            Id:userId
+        }})
+
+        res.send({
+            count : posts.length,
+            posts: posts
+        })
+
+    }catch(err){
+        res.status(400).send({
+            error: err.message
+        })
+    }
+});
+
 
 app.get('/dashboard/:userId',isAuthorized, isAdmin,async(req,res) =>{
       try {
