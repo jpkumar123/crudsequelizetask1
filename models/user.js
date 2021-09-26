@@ -1,25 +1,25 @@
-module.exports = ( sequelize,Sequelize) => {
+export default (sequelize, {STRING, INTEGER}) => {
 
     const User = sequelize.define("user", {
         email: {
-            type: Sequelize.STRING,
+            type: STRING,
             validate:{
                 isEmail: true
             }
         },
 
         password: {
-            type: Sequelize.STRING
+            type: STRING
         },
         role: {
-            type: Sequelize.STRING
+            type: STRING
         },
 
         name:{
-            type:Sequelize.STRING
+            type:STRING
         },
         mobilenumber:{
-            type:Sequelize.INTEGER,
+            type:INTEGER,
             validate:{
                 len:[0,11]
             }

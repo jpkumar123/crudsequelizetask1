@@ -1,4 +1,5 @@
-module.exports = {
+
+export default {
     host: "localhost",
     port : 3306,
     user: "root",
@@ -12,5 +13,5 @@ module.exports = {
         idle: 100000
     }
 };
-const Sequelize = require('sequelize');
 
+import Sequelize from 'sequelize';

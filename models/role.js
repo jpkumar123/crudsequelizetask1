@@ -1,13 +1,13 @@
-module.exports = (sequelize, Sequelize) => {
-    const Role = sequelize.define("roles", {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true
-      },
-      name: {
-        type: Sequelize.STRING
-      }
-    });
-  
-    return Role;
-  };
+export default (sequelize, {INTEGER, STRING}) => {
+  const Role = sequelize.define("roles", {
+    id: {
+      type: INTEGER,
+      primaryKey: true
+    },
+    name: {
+      type: STRING
+    }
+  });
+
+  return Role;
+};
