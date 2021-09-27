@@ -1,5 +1,7 @@
-const dbConfig = require('../dbconfig.js')
-const Sequelize = require('sequelize');
+import dbConfig from '../dbconfig.js';
+import userModel from "./user.js";
+import postModel from "./post.js"
+import Sequelize from 'sequelize';
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.user, dbConfig.password, {
     host: dbConfig.host,
     port: dbConfig.port,
@@ -10,15 +12,13 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.user, dbConfig.password, {
         min: dbConfig.pool.min,
         acquire: dbConfig.pool.acquire,
         idle: dbConfig.pool.idle
-    },
-    
-    },
+    }
 
-);
+});
 
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-db.users = require('./user.js')(sequelize, Sequelize);
-db.post  = require('./post.js')(sequelize,Sequelize);
-module.exports = db;
+db.users = userModel(sequelize, Sequelize);
+db.post = postModel(sequelize, Sequelize);
+export default db;
