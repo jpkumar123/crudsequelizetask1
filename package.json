@@ -19,9 +19,21 @@
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-validator": "^6.12.1",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.0",
+    "path": "^0.12.7",
     "sequelize": "^6.6.5",
     "tedious": "^12.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/node": "^7.6.3",
+    "@babel/preset-env": "^7.6.3",
+    "eslint": "6.1.0",
+    "eslint-config-airbnb-base": "14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "nodemon": "^1.19.3"
   }
 }
