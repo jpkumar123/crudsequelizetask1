@@ -1,21 +1,19 @@
 import express from "express";
 import Sequelize from "sequelize";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import db from "./models/index.js";
+import dotenv from "dotenv";
 
 const app = express();
 const port = 8000;
-import jwt from "jsonwebtoken";
-import db from "./models/index.js";
+const { User ,Role} = db;
 const saltRounds = 10;
 app.use(express.json());
 db.sequelize.sync();
-
-import dotenv from "dotenv";
-
+console.log(db, "db");
 dotenv.config();
 const TOKEN_KEY = "process.env.TOKEN_KEY";
-
-
 
 app.get("/get", (req, res) => {
   db.user.findAll({});
@@ -39,8 +37,18 @@ app.post("/signup", ({ body }, res) => {
 app.post("/login", ({ body }, res) => {
   let { email, password, name, mobilenumber } = body;
   db.users
-    .findOne({ where: { email } })
+    .findOne({
+      where : {email},
+      include: [
+        {
+          model: Role,
+          as: "Role",
+        },
+      ],
+    })
+
     .then((user) => {
+      console.log(user);
       if (user == null)
         return res.status(404).send({
           status: "Not found",
@@ -51,9 +59,8 @@ app.post("/login", ({ body }, res) => {
         if (!result) {
           return res.status(400).send({ message: "Invalid Credentials." });
         }
-        
-        const token = jwt.sign({ id: user.id, email: user.email }, TOKEN_KEY
-          );
+
+        const token = jwt.sign({ id: user.id, email: user.email }, TOKEN_KEY);
         user.password = undefined;
         return res.status(200).send({
           user: user,
@@ -69,7 +76,7 @@ const insertUser = (user, res) => {
   console.log(user);
   bcrypt.hash(user.password, saltRounds, (err, hashValue) => {
     if (err) res.status(500).send({ message: err.message });
-    db.users
+    db.user
       .create({
         email: user.email,
         password: hashValue,
@@ -102,8 +109,6 @@ const isAuthorized = async (req, res, next) => {
       throw new Error("not authorized");
     }
   } catch (err) {
-    //
-
     res.status(400).send("Invaliduser");
   }
 };
@@ -153,10 +158,11 @@ app.post("/post", isAuthorized, async ({ body, user }, res) => {
   console.log("debug", payload);
 
   try {
-    const newPost = await db.post.create(payload);
+    const newPost = await db.Post.create(payload);
     res.status(200).send(newPost);
   } catch (error) {
-    res.status(401).end("Invaliduser");
+    console.log(error);
+    res.status(401).end("error");
   }
 });
 app.put("/post/:postId", isAuthorized, async ({ params, body }, res, next) => {
@@ -187,12 +193,10 @@ app.put("/post/:postId", isAuthorized, async ({ params, body }, res, next) => {
     res.status(400).end();
   }
 });
-
 app.get("/userposts/:postId", isAuthorized, async ({ params }, res) => {
   try {
     // # of posts
     //list of posts
-
     const postId = params.postId;
     const posts = await db.post.findOne({
       where: {
@@ -210,14 +214,13 @@ app.get("/userposts/:postId", isAuthorized, async ({ params }, res) => {
     });
   }
 });
-
 app.get("/myposts", isAuthorized, async ({ user }, res) => {
   const userId = user.id;
 
   try {
     // # of posts
     const userId = user.id;
-    const posts = await db.post.findOne({
+    const posts = await db.Post.findOne({
       where: {
         Id: userId,
       },
@@ -259,9 +262,7 @@ app.get("/allposts", isAuthorized, isAdmin, async (req, res) => {
   try {
     // # of posts
     //list of posts
-
     const posts = await db.post.findAll();
-
     res.send({
       posts,
     });
@@ -271,6 +272,23 @@ app.get("/allposts", isAuthorized, isAdmin, async (req, res) => {
     });
   }
 });
+app.get("/allofmyposts", isAuthorized, async (req, res) => {
+  try {
+    console.log({
+      user: User,
+    });
+    const posts = await db.Post.findAll({
+      include: {
+        model: User,
+        as: "author",
+      },
+    });
+    return res.status(200).json({ posts });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 app.delete("/post", isAuthorized, async ({ body }, res, next) => {
   try {
     const id = body.id;

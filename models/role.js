@@ -1,12 +1,12 @@
-export default (sequelize, {INTEGER, STRING}) => {
+export default (sequelize, { INTEGER, STRING }) => {
   const Role = sequelize.define("roles", {
     id: {
       type: INTEGER,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
-      type: STRING
-    }
+      type: STRING,
+    },
   });
 
   return Role;
